@@ -20,6 +20,3 @@ if __name__ == '__main__':
     df = pd.DataFrame.from_records(data)
     print("DB Trips: ", df)
     print("Connected to January 2019 dataset")
-
-
-
