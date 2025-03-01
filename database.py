@@ -39,6 +39,12 @@ class Database:
         columns = [col[1] for col in self._cursor.fetchall()]
         return columns
 
+    def get_database_size(self) -> int:
+        """
+        :return: size of the database
+        """
+        self._cursor.execute("SELECT COUNT(*) FROM tripdata;")
+        return self._cursor.fetchone()[0]
 
     def get_data_array(self) -> np.ndarray:
         """
@@ -77,6 +83,32 @@ class Database:
         """
         query = "SELECT * from tripdata"
         data = self._cursor.execute(query).fetchmany(n)
+        df = pd.DataFrame.from_records(data)
+        df.columns = self.get_column_names()
+        return df
+
+    def get_dataframe_random_sample(self, percentage: float = 0.05) -> pd.DataFrame:
+        """
+        This method fetches a random sample of rows from the table using a probabilistic WHERE clause,
+        which is more efficient than ORDER BY RANDOM() for large tables.
+        :param percentage: The approximate percentage of rows to sample (0.0 to 1.0)
+        :return: Pandas dataframe with a random sample of rows
+        """
+        if not 0.0 <= percentage <= 1.0:
+            raise ValueError("Percentage must be between 0.0 and 1.0")
+
+        # Use a large modulus for precise percentage calculation
+        modulus = 1000000  # Allows up to 0.0001% increments
+        threshold = int(round(percentage * modulus))
+
+        query = "SELECT * FROM tripdata WHERE ABS(RANDOM()) % ? < ?"
+
+        self._cursor.execute(query, (modulus, threshold))
+        data = self._cursor.fetchall()
+
+        if not data:
+            return pd.DataFrame(columns=self.get_column_names())
+
         df = pd.DataFrame.from_records(data)
         df.columns = self.get_column_names()
         return df
