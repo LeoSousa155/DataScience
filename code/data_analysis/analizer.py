@@ -60,7 +60,7 @@ class DataAnalizer:
         """
         x = self.df.drop(columns=[self.target])
         y = self.df[self.target]
-        x_train, y_train, x_test, y_test = train_test_split(
+        x_train, x_test, y_train, y_test = train_test_split(
             x, y, test_size=self.test_size,random_state=self.random_state
         )
         self.data_train  = x_train
@@ -83,7 +83,6 @@ class DataAnalizer:
             print(f"Feature columns {cols} dropped successfully.")
         except Exception as e:
             print(f"Error dropping columns {cols}:", e)
-
 
 
 class TripDataAnalizer(DataAnalizer):
@@ -121,9 +120,52 @@ class TripDataAnalizer(DataAnalizer):
         df = self.extract_datetime_features(df)
         df = self.calculate_trip_duration(df)
         df = self.calculate_average_speed(df)
+        df = self.drop_columns(df)
+        df = self.order_numerical_categorical(df)
 
         super().__init__(df, target, test_size, random_state)
 
+
+    def order_numerical_categorical(self, df):
+        """
+        Groups the features by the numerical and categorical groups.
+        """
+        df = df.loc[:,
+            [
+                # continuous data
+                'trip_distance',
+                'trip_duration_min',
+                'average_speed_mph',
+
+                # discrete data
+                'passenger_count',
+
+                # categorical data
+                'vendorid',
+                'ratecodeid',
+                'pulocationid',
+                'dolocationid',
+                'payment_type',
+
+                # por ordenar
+                'extra',
+                'mta_tax',
+                'tip_amount',
+                'tolls_amount',
+                'improvement_surcharge',
+                'total_amount',
+                'congestion_surcharge',
+                'pickup_hour',
+                'pickup_day_of_week',
+                'pickup_day_of_month',
+                'pickup_month',
+                'dropoff_hour',
+                'dropoff_day_of_week',
+                'dropoff_day_of_month',
+                'dropoff_month',
+             ]
+        ]
+        return df
 
 
     # Metodo para separar "tpep_pickup_datetime" e "tpep_dropoff_datetime" em várias features
@@ -184,6 +226,11 @@ class TripDataAnalizer(DataAnalizer):
 
     def drop_columns(self, df):
         """Drops unnecessary or problematic features from the dataset"""
+
+        # these features where transformed in other ones
         df.drop(columns=['tpep_pickup_datetime'], inplace=True)
         df.drop(columns=['tpep_dropoff_datetime'], inplace=True)
+
+        # this flag will be irrelevant for our analysis
+        df.drop(columns=["store_and_fwd_flag"], inplace=True)
         return df

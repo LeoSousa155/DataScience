@@ -5,14 +5,15 @@ class DataCleaning:
 
     Methods:
         remove_duplicates(): Remove duplicate rows from the dataset.
-        handle_missing_values(strategy='mean'): Handle missing values using the specified strategy.
+        handle_missing_values(strategy='drop'): Handle missing values using the specified strategy.
+        detect_outliers(threshhold=4): Detect outliers in numerical features using z-score method.
         remove_outliers(threshold=3): Remove outliers from the dataset
     """
-    def __init__(self, data_loader):
+    def __init__(self, data_analizer):
         """
         Initializes the DataPreprocessing class with a DataLoader object.
         """
-        self.data_loader = data_loader
+        self.data_analizer = data_analizer
 
     def remove_duplicates(self):
         """
@@ -20,14 +21,14 @@ class DataCleaning:
         """
         try:
             # Check if data and labels are not None
-            if self.data_loader.data_train is None:
+            if self.data_analizer.data_train is None:
                 raise ValueError("Data has not been loaded yet.")
-            if self.data_loader.labels_train is None:
+            if self.data_analizer.labels_train is None:
                 raise ValueError("Labels have not been loaded yet.")
 
             # Remove duplicate rows from training data (do not apply to test data)
-            self.data_loader.data_train.drop_duplicates(inplace=True)
-            self.data_loader.labels_train = self.data_loader.labels_train[self.data_loader.data_train.index]
+            self.data_analizer.data_train.drop_duplicates(inplace=True)
+            self.data_analizer.labels_train = self.data_analizer.labels_train[self.data_analizer.data_train.index]
 
             print("Duplicate rows removed from training data.")
 
@@ -43,32 +44,32 @@ class DataCleaning:
         """
         try:
             # Check if data is not None
-            if self.data_loader.data_train is None or self.data_loader.data_test is None :
+            if self.data_analizer.data_train is None or self.data_analizer.data_test is None :
                 raise ValueError("Data has not been loaded yet.")
 
             # Check if there are missing values
-            if self.data_loader.data_train.isnull().sum().sum() == 0 and self.data_loader.data_test.isnull().sum().sum() == 0:
+            if self.data_analizer.data_train.isnull().sum().sum() == 0 and self.data_analizer.data_test.isnull().sum().sum() == 0:
                 print("No missing values found in the data.")
                 return
 
             # Handle missing values based on the specified strategy
             if strategy == 'mean':
-                self.data_loader.data_train.fillna(self.data_loader.data_train.mean(), inplace=True)
-                self.data_loader.data_test.fillna(self.data_loader.data_test.mean(), inplace=True)
+                self.data_analizer.data_train.fillna(self.data_analizer.data_train.mean(), inplace=True)
+                self.data_analizer.data_test.fillna(self.data_analizer.data_test.mean(), inplace=True)
             elif strategy == 'median':
-                self.data_loader.data_train.fillna(self.data_loader.data_train.median(), inplace=True)
-                self.data_loader.data_test.fillna(self.data_loader.data_test.median(), inplace=True)
+                self.data_analizer.data_train.fillna(self.data_analizer.data_train.median(), inplace=True)
+                self.data_analizer.data_test.fillna(self.data_analizer.data_test.median(), inplace=True)
             elif strategy == 'most_frequent':
-                self.data_loader.data_train.fillna(self.data_loader.data_train.mode().iloc[0], inplace=True)
-                self.data_loader.data_test.fillna(self.data_loader.data_test.mode().iloc[0], inplace=True)
+                self.data_analizer.data_train.fillna(self.data_analizer.data_train.mode().iloc[0], inplace=True)
+                self.data_analizer.data_test.fillna(self.data_analizer.data_test.mode().iloc[0], inplace=True)
             elif strategy == 'fill_nan':
-                self.data_loader.data_train.fillna(strategy, inplace=True)
-                self.data_loader.data_test.fillna(strategy, inplace=True)
+                self.data_analizer.data_train.fillna(strategy, inplace=True)
+                self.data_analizer.data_test.fillna(strategy, inplace=True)
             elif strategy == 'drop':
-                self.data_loader.data_train = self.data_loader.data_train.dropna(axis=0)
-                self.data_loader.labels_train = self.data_loader.labels_train[self.data_loader.data_train.index]
-                self.data_loader.data_test = self.data_loader.data_test.dropna(axis=0)
-                self.data_loader.labels_test = self.data_loader.labels_test[self.data_loader.data_test.index]
+                self.data_analizer.data_train = self.data_analizer.data_train.dropna(axis=0)
+                self.data_analizer.labels_train = self.data_analizer.labels_train[self.data_analizer.data_train.index]
+                self.data_analizer.data_test = self.data_analizer.data_test.dropna(axis=0)
+                self.data_analizer.labels_test = self.data_analizer.labels_test[self.data_analizer.data_test.index]
 
             else:
                 raise ValueError("Invalid strategy.")
@@ -89,17 +90,17 @@ class DataCleaning:
         """
         try:
             # Check if test data is not None
-            if self.data_loader.data_train is None:
+            if self.data_analizer.data_train is None:
                 raise ValueError("Data has not been loaded yet.")
 
             # Identify numerical features
-            numerical_features = self.data_loader.data_train.select_dtypes(include=['number'])
+            numerical_features = self.data_analizer.data_train.select_dtypes(include=['number'])
 
             # Calculate z-scores for numerical features
             z_scores = (numerical_features - numerical_features.mean()) / numerical_features.std()
 
             # Find outliers based on threshold
-            outliers = self.data_loader.data_train[(z_scores.abs() > threshold).any(axis=1)]
+            outliers = self.data_analizer.data_train[(z_scores.abs() > threshold).any(axis=1)]
 
             return outliers
 
@@ -114,8 +115,8 @@ class DataCleaning:
             threshold (float): The threshold value for determining outliers.
         """
         try:
-            # Check if data_loader.data is not None
-            if self.data_loader.data_train is None:
+            # Check if data_analizer.data is not None
+            if self.data_analizer.data_train is None:
                 raise ValueError("Data has not been loaded yet.")
 
             # Detect outliers

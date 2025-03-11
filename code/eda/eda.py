@@ -16,15 +16,6 @@ class EDA:
         """
         self.df = df
 
-    def adjust_columns(self):
-        """
-            Adjusts specific columns in the dataset:
-            - Converts "tpep_pickup_datetime" and "tpep_dropoff_datetime" to datetime format.
-            - Removes the "store_and_fwd_flag" column as it may not be relevant for analysis.
-        """
-        self.df["tpep_pickup_datetime"] = pd.to_datetime(self.df["tpep_pickup_datetime"], errors="coerce")
-        self.df["tpep_dropoff_datetime"] = pd.to_datetime(self.df["tpep_dropoff_datetime"], errors="coerce")
-        self.df.drop(columns=["store_and_fwd_flag"], inplace=True)
 
     def dataset_overview(self):
         """
@@ -110,7 +101,6 @@ class EDA:
             :param date_column: Optional, name of the column with datetime values.
             :param target_variable: Optional, target variable to analyze trends over time.
         """
-        self.adjust_columns()
         self.dataset_overview()
         self.visualize_distributions()
         self.boxplot_outliers()
