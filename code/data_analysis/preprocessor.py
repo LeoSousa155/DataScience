@@ -1,7 +1,7 @@
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
-class DataPreprocessing:
+class DataPreprocessor:
     """
     Class responsible for preprocessing the loaded dataset. Need to pass the data with first columns as numerical and the last columns as categorical, then indicate how many categorical features are present in the dataset
 

@@ -2,19 +2,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 class EDA:
     """
     Exploratory Data Analysis (EDA) class to analyze and visualize dataset properties.
 
     """
 
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, analizer):
         """
-            Initializes the EDA class with a pandas DataFrame.
+            Initializes the EDA class with a DataAnalizer object.
 
-            :param df: DataFrame containing the dataset to analyze.
+            :param analizer: DataAnalizer instance.
         """
-        self.df = df
+        self.analizer = analizer
 
 
     def dataset_overview(self):
@@ -25,18 +26,18 @@ class EDA:
             - Displays the count of missing values per column.
         """
         print("Dataset Info:\n")
-        print(self.df.info())
+        print(self.analizer.data_train.info())
         print("\n Summary Statistics:\n")
-        print(self.df.describe())
+        print(self.analizer.data_train.describe())
         print("\nMissing Values:\n")
-        print(self.df.isnull().sum())
+        print(self.analizer.data_train.isnull().sum())
 
     def visualize_distributions(self):
         """
             Visualizes the distribution of numerical features using histograms.
         """
         plt.figure(figsize=(12, 6))
-        self.df.hist(figsize=(12, 8), bins=30)
+        self.analizer.data_train.hist(figsize=(12, 8), bins=30)
         plt.suptitle("Feature Distributions", fontsize=16)
         plt.show()
 
@@ -44,7 +45,7 @@ class EDA:
         """
             Creates boxplots for numerical features to help detect outliers.
         """
-        self.df.plot(kind='box', subplots=True, layout=(4, 4), figsize=(12, 12), notch=True)
+        self.analizer.data_train.plot(kind='box', subplots=True, layout=(6, 4), figsize=(12, 12), notch=True)
         plt.suptitle("Boxplots for Outlier Detection", fontsize=16)
         plt.show()
 
@@ -53,7 +54,7 @@ class EDA:
             Generates a heatmap showing correlations between numerical features.
         """
         plt.figure(figsize=(10, 6))
-        sns.heatmap(self.df.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+        sns.heatmap(self.analizer.data_train.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
         plt.title("Feature Correlation Matrix")
         plt.show()
 
@@ -62,7 +63,7 @@ class EDA:
             Displays pairplots to visualize relationships between numerical features.
             Kernel Density Estimation (KDE) is used for diagonal plots.
         """
-        sns.pairplot(self.df, diag_kind='kde')
+        sns.pairplot(self.analizer.data_train, diag_kind='kde')
         plt.show()
 
     def time_based_analysis(self, date_column, target_variable):
@@ -72,14 +73,14 @@ class EDA:
             :param date_column: Name of the column containing datetime values.
             :param target_variable: The target variable to visualize against time.
         """
-        if date_column in self.df.columns:
-            self.df[date_column] = pd.to_datetime(self.df[date_column])
-            self.df['year'] = self.df[date_column].dt.year
-            self.df['month'] = self.df[date_column].dt.month
-            self.df['day_of_week'] = self.df[date_column].dt.dayofweek
+        if date_column in self.analizer.data_train.columns:
+            self.analizer.data_train[date_column] = pd.to_datetime(self.analizer.data_train[date_column])
+            self.analizer.data_train['year'] = self.analizer.data_train[date_column].dt.year
+            self.analizer.data_train['month'] = self.analizer.data_train[date_column].dt.month
+            self.analizer.data_train['day_of_week'] = self.analizer.data_train[date_column].dt.dayofweek
 
             plt.figure(figsize=(12, 5))
-            sns.lineplot(x=self.df[date_column], y=self.df[target_variable])
+            sns.lineplot(x=self.analizer.data_train[date_column], y=self.analizer.data_train[target_variable])
             plt.title("Trend Over Time")
             plt.show()
 
@@ -87,10 +88,10 @@ class EDA:
         """
             Analyzes categorical variables by displaying their distribution as bar charts.
         """
-        categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns
+        categorical_cols = self.analizer.data_train.select_dtypes(include=['object', 'category']).columns
         for col in categorical_cols:
             plt.figure(figsize=(8, 4))
-            sns.countplot(y=self.df[col], order=self.df[col].value_counts().index)
+            sns.countplot(y=self.analizer.data_train[col], order=self.analizer.data_train[col].value_counts().index)
             plt.title(f"Distribution of {col}")
             plt.show()
 

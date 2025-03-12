@@ -58,8 +58,8 @@ class DataAnalizer:
             - data_test: Feature data for testing.
             - labels_test: Labels for testing.
         """
-        x = self.df.drop(columns=[self.target])
         y = self.df[self.target]
+        x = self.df.drop(columns=[self.target])
         x_train, x_test, y_train, y_test = train_test_split(
             x, y, test_size=self.test_size,random_state=self.random_state
         )
@@ -136,25 +136,13 @@ class TripDataAnalizer(DataAnalizer):
                 'trip_distance',
                 'trip_duration_min',
                 'average_speed_mph',
+                'fare_amount',
+                'tip_amount',
+                'tolls_amount',
+                'extra',
 
                 # discrete data
                 'passenger_count',
-
-                # categorical data
-                'vendorid',
-                'ratecodeid',
-                'pulocationid',
-                'dolocationid',
-                'payment_type',
-
-                # por ordenar
-                'extra',
-                'mta_tax',
-                'tip_amount',
-                'tolls_amount',
-                'improvement_surcharge',
-                'total_amount',
-                'congestion_surcharge',
                 'pickup_hour',
                 'pickup_day_of_week',
                 'pickup_day_of_month',
@@ -163,6 +151,15 @@ class TripDataAnalizer(DataAnalizer):
                 'dropoff_day_of_week',
                 'dropoff_day_of_month',
                 'dropoff_month',
+                'mta_tax',
+                'congestion_surcharge',
+
+                # categorical data
+                'vendorid',
+                'ratecodeid',
+                'pulocationid',
+                'dolocationid',
+                'payment_type'
              ]
         ]
         return df
@@ -218,7 +215,7 @@ class TripDataAnalizer(DataAnalizer):
 
         # Avoid division by zero for extremely short trips
         df['average_speed_mph'] = df['trip_distance'] / (df['trip_duration_min'] / 60)
-        df['average_speed_mph'].fillna(0, inplace=True)  # Replace NaN values with 0
+        df.fillna({'average_speed_mph': 0}, inplace=True) # Replace NaN values with 0
 
         print("Average speed calculated successfully.")
         return df
@@ -233,4 +230,10 @@ class TripDataAnalizer(DataAnalizer):
 
         # this flag will be irrelevant for our analysis
         df.drop(columns=["store_and_fwd_flag"], inplace=True)
+
+        # problematic for the problem (solution can be devired from this one)
+        df.drop(columns=['total_amount'], inplace=True)
+
+        # constant feature
+        df.drop(columns=['improvement_surcharge'], inplace=True)
         return df
