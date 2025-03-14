@@ -59,3 +59,20 @@ O dataset inclui as seguintes colunas:
 - **Tip_amount**: Valor da gorjeta (preenchido automaticamente para pagamentos com cartão; gorjetas em dinheiro não são registradas).
 - **Tolls_amount**: Valor total de pedágios pagos durante a viagem.
 - **Total_amount**: Valor total cobrado do passageiro (não inclui gorjetas pagas em dinheiro).
+
+# Procedimento
+
+## 1
+
+## 1
+
+## 1
+
+## 1
+
+## Remoção de features 
+- Features problemáticas
+- Features constantes
+- ...
+
+## Criação de notas features

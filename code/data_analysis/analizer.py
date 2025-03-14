@@ -89,151 +89,104 @@ class TripDataAnalizer(DataAnalizer):
     """
     TripDataAnalizer is a class that inherits from DataAnalizer and extends its functionality
     to preprocess and engineer features specifically for trip data.
-
-    This class performs several data manipulation tasks, including:
-
-    -   Extracting datetime features from pickup and dropoff timestamps.
-    -   Calculating the trip duration in minutes.
-    -   Calculating the average speed of the trip in miles per hour.
-
-    It assumes the input DataFrame contains columns 'tpep_pickup_datetime',
-    'tpep_dropoff_datetime', and 'trip_distance'.
-
-    The class initializes with a DataFrame, target column, test size for train-test split,
-    and a random state for reproducibility. It then automatically calls methods to extract
-    datetime features, calculate trip duration, and calculate average speed.
     """
 
     def __init__(self, df: pd.DataFrame, target: str, test_size=0.2, random_state=None):
         """
-        Initializes the TripDataAnalizer instance and splits the dataset into training and test sets.
-        It also calls class specific methods of the class.
-
-        Args:
-            df (pd.DataFrame): The dataset to be split.
-            target (str): The name of the target column in the dataset.
-            test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
-            random_state (int or None, optional): The random seed used for shuffling the data. Default is None.
+        Initializes the TripDataAnalizer instance and processes the dataset.
         """
+        self.df = df.copy()
+        self.target = target
+        self.test_size = test_size
+        self.random_state = random_state
 
-        #Manipulate data
-        df = self.extract_datetime_features(df)
-        df = self.calculate_trip_duration(df)
-        df = self.calculate_average_speed(df)
-        df = self.drop_columns(df)
-        df = self.order_numerical_categorical(df)
+        # Preprocess data
+        self.extract_datetime_features()
+        self.drop_columns()
+        self.order_numerical_categorical()
 
-        super().__init__(df, target, test_size, random_state)
+        # Initialize parent class
+        super().__init__(self.df, self.target, self.test_size, self.random_state)
 
-
-    def order_numerical_categorical(self, df):
+    def order_numerical_categorical(self):
         """
-        Groups the features by the numerical and categorical groups.
+        Groups the features into numerical and categorical groups.
         """
-        df = df.loc[:,
-            [
-                # continuous data
-                'trip_distance',
-                'trip_duration_min',
-                'average_speed_mph',
-                'fare_amount',
-                'tip_amount',
-                'tolls_amount',
-                'extra',
+        self.df = self.df.loc[:,[
+             # continuous data
+             'trip_distance',
+             'fare_amount',
+             'tip_amount',
+             'tolls_amount',
+             'extra',
+             'pickup_time_in_seconds',
+             'dropoff_time_in_seconds',
 
-                # discrete data
-                'passenger_count',
-                'pickup_hour',
-                'pickup_day_of_week',
-                'pickup_day_of_month',
-                'pickup_month',
-                'dropoff_hour',
-                'dropoff_day_of_week',
-                'dropoff_day_of_month',
-                'dropoff_month',
-                'mta_tax',
-                'congestion_surcharge',
+             # discrete data
+             'passenger_count',
+             'pickup_hour',
+             'pickup_day_of_week',
+             'pickup_day_of_month',
+             'pickup_month',
+             'dropoff_hour',
+             'dropoff_day_of_week',
+             'dropoff_day_of_month',
+             'dropoff_month',
+             'mta_tax',
+             'congestion_surcharge',
 
-                # categorical data
-                'vendorid',
-                'ratecodeid',
-                'pulocationid',
-                'dolocationid',
-                'payment_type'
-             ]
-        ]
-        return df
+             # categorical data
+             'vendorid',
+             'ratecodeid',
+             'pulocationid',
+             'dolocationid',
+             'payment_type',
+         ]]
 
-
-    # Metodo para separar "tpep_pickup_datetime" e "tpep_dropoff_datetime" em várias features
-    def extract_datetime_features(self, df):
+    def extract_datetime_features(self):
         """
-        Converts pickup and dropoff datetimes into a datetime object.
-        This method also creates usefull new features from this object to extract future insights about time
+        Converts pickup and dropoff datetimes into datetime objects and extracts features.
         """
-
-        # Ensure datetime columns are in the correct format
-        df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
-        df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'])
+        self.df['tpep_pickup_datetime'] = pd.to_datetime(self.df['tpep_pickup_datetime'])
+        self.df['tpep_dropoff_datetime'] = pd.to_datetime(self.df['tpep_dropoff_datetime'])
 
         # Extract features from pickup time
-        df['pickup_hour'] = df['tpep_pickup_datetime'].dt.hour
-        df['pickup_day_of_week'] = df['tpep_pickup_datetime'].dt.dayofweek
-        df['pickup_day_of_month'] = df['tpep_pickup_datetime'].dt.day
-        df['pickup_month'] = df['tpep_pickup_datetime'].dt.month
+        self.df['pickup_time_in_seconds'] = (self.df['tpep_pickup_datetime'] - pd.Timestamp("1970-01-01")) // pd.Timedelta('1s')
+        self.df['pickup_hour'] = self.df['tpep_pickup_datetime'].dt.hour
+        self.df['pickup_day_of_week'] = self.df['tpep_pickup_datetime'].dt.dayofweek
+        self.df['pickup_day_of_month'] = self.df['tpep_pickup_datetime'].dt.day
+        self.df['pickup_month'] = self.df['tpep_pickup_datetime'].dt.month
 
         # Extract features from dropoff time
-        df['dropoff_hour'] = df['tpep_dropoff_datetime'].dt.hour
-        df['dropoff_day_of_week'] = df['tpep_dropoff_datetime'].dt.dayofweek
-        df['dropoff_day_of_month'] = df['tpep_dropoff_datetime'].dt.day
-        df['dropoff_month'] = df['tpep_dropoff_datetime'].dt.month
+        self.df['dropoff_time_in_seconds'] = (self.df['tpep_dropoff_datetime'] - pd.Timestamp("1970-01-01")) // pd.Timedelta('1s')
+        self.df['dropoff_hour'] = self.df['tpep_dropoff_datetime'].dt.hour
+        self.df['dropoff_day_of_week'] = self.df['tpep_dropoff_datetime'].dt.dayofweek
+        self.df['dropoff_day_of_month'] = self.df['tpep_dropoff_datetime'].dt.day
+        self.df['dropoff_month'] = self.df['tpep_dropoff_datetime'].dt.month
 
         print("Feature columns extracted successfully.")
-        return df
 
-    # Metodo para calcular o tempo de duração da viagem
-    def calculate_trip_duration(self, df):
-        """Calculates the duration of the trip in minutes."""
+    def drop_columns(self):
+        """
+        Drops unnecessary or problematic features from the dataset.
+        """
+        columns_to_drop = [
+            'store_and_fwd_flag',       # Irrelevant flag
+            'total_amount',             # Problematic for analysis (fare = total - taxes)
+            'improvement_surcharge'     # Constant feature
+            'tpep_pickup_datetime',     # Decomposed in other features
+            'tpep_dropoff_datetime',    # Decomposed in other features
+        ]
 
-        # Ensure the dataset has the necessary distance column
-        if 'tpep_dropoff_dateime' and 'tpep_pickup_datetime' not in df.columns:
-            raise ValueError("tpep time stamps collums are missing from the dataset.")
+        # tpep_pickup_datetime and tpep_dropoff_datetime are dropped inside featureGenerator
+        # because they are necessary for the creation of  travel time feature
 
-        # Compute trip duration in minutes
-        df['trip_duration_min'] = (df['tpep_dropoff_datetime'] - df['tpep_pickup_datetime']).dt.total_seconds() / 60
-
-        print("Trip duration calculated successfully.")
-        return df
-
-    # Metodo para calcular a velocidade média da viagem
-    def calculate_average_speed(self, df):
-        """Calculates the average speed of the trip in km/h."""
-
-        # Ensure the dataset has the necessary distance column
-        if 'trip_distance'  not in df.columns:
-            raise ValueError("Column 'trip_distance' is missing from the dataset.")
-
-        # Avoid division by zero for extremely short trips
-        df['average_speed_mph'] = df['trip_distance'] / (df['trip_duration_min'] / 60)
-        df.fillna({'average_speed_mph': 0}, inplace=True) # Replace NaN values with 0
-
-        print("Average speed calculated successfully.")
-        return df
+        self.df.drop(columns=[col for col in columns_to_drop if col in self.df.columns], inplace=True)
 
 
-    def drop_columns(self, df):
-        """Drops unnecessary or problematic features from the dataset"""
-
-        # these features where transformed in other ones
-        df.drop(columns=['tpep_pickup_datetime'], inplace=True)
-        df.drop(columns=['tpep_dropoff_datetime'], inplace=True)
-
-        # this flag will be irrelevant for our analysis
-        df.drop(columns=["store_and_fwd_flag"], inplace=True)
-
-        # problematic for the problem (solution can be devired from this one)
-        df.drop(columns=['total_amount'], inplace=True)
-
-        # constant feature
-        df.drop(columns=['improvement_surcharge'], inplace=True)
-        return df
+    def drop_column(self, col_name: str):
+        if col_name in self.df.columns:
+            self.df.drop(col_name, inplace=True)
+            print(f"Feature '{col_name}' dropped successfully.")
+        else:
+            print(f"Feature '{col_name}' was not found in the dataset.")
