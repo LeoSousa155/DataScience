@@ -85,6 +85,42 @@ class DataAnalizer:
             print(f"Error dropping columns {cols}:", e)
 
 
+    def save_dataset(self, file_path: str):
+        """
+        Saves the entire dataset (DataFrame) to disk as a CSV file.
+
+        Args:
+            file_path (str): The path (including filename) where the dataset will be saved.
+        """
+        try:
+            self.df.to_csv(file_path, index=False, chunksize=100000)
+            print(f"Dataset saved successfully to {file_path}.")
+        except Exception as e:
+            print(f"Error saving dataset to {file_path}:", e)
+
+    @classmethod
+    def load_dataset(cls, file_path: str, target: str, test_size=0.2, random_state=None):
+        """
+        Loads a dataset from disk and returns a new instance of DataAnalizer.
+
+        Args:
+            file_path (str): The path (including filename) from where the dataset will be loaded.
+            target (str): The name of the target column in the dataset.
+            test_size (float, optional): The proportion of the dataset to include in the test split. Default is 0.2.
+            random_state (int or None, optional): The random seed used for shuffling the data. Default is None.
+
+        Returns:
+            DataAnalizer: An instance of the DataAnalizer class with the loaded dataset.
+        """
+        try:
+            df = pd.read_csv(file_path)
+            print(f"Dataset loaded successfully from {file_path}.")
+            return cls(df, target, test_size, random_state)
+        except Exception as e:
+            print(f"Error loading dataset from {file_path}:", e)
+            return None
+
+
 class TripDataAnalizer(DataAnalizer):
     """
     TripDataAnalizer is a class that inherits from DataAnalizer and extends its functionality

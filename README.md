@@ -62,17 +62,31 @@ O dataset inclui as seguintes colunas:
 
 # Procedimento
 
-## 1
+## 1.ª FASE - DISCOVERY
 
-## 1
+Nesta fase inicial, o foco foi enquadrar o problema de negócio como um desafio de análise de dados. O dataset fornecido contém informações detalhadas sobre viagens de táxi em Nova Iorque ao longo de um ano. O objetivo principal é construir um modelo capaz de prever o valor da tarifa (`fare_amount`) com base nas diversas variáveis associadas a cada viagem, como horário de início e fim, distância percorrida e número de passageiros.
 
-## 1
+## 2.ª FASE - DATA PRE-PROCESSING
 
-## 1
+A fase de pré-processamento de dados envolveu a limpeza e transformação dos dados para torná-los adequados para modelagem. Foram realizadas as seguintes etapas:
 
-## Remoção de features 
-- Features problemáticas
-- Features constantes
-- ...
+- **Limpeza de dados:** Identificação e tratamento de valores ausentes, outliers e inconsistências nos dados.
+- **Engenharia de features:** Criação de novas features que podem ser relevantes para o modelo de previsão. Algumas das novas features criadas incluem:
+    - `pickup_hour`: Hora do dia em que a viagem começou.
+    - `dropoff_day_of_month`: Dia do mês em que a viagem terminou.
+    - `trip_distance_month`: Distância da viagem por mês.
+    - `pickup_seconds`: Tempo de início da viagem em segundos.
+    - `dropoff_seconds`: Tempo de fim da viagem em segundos.
+    - Estatísticas agregadas como média de `extra`, `MTA_tax`, `tolls_amount` e percentis de `trip_distance` e `fare_amount`.
 
-## Criação de notas features
+A importância das features foi avaliada após a criação das novas features, conforme ilustrado na Figura 6 do relatório. Histogramas e boxplots foram utilizados para visualizar o comportamento das features antes e depois da criação das novas variáveis (Figura 8).
+
+## 3.ª FASE - MODEL PLANNING
+
+Após a análise e tratamento dos dados, concluiu-se que o modelo mais apropriado para este problema é o **Random Forest**. Esta escolha foi motivada pelas seguintes razões:
+
+- Presença de relações não lineares entre as diferentes features.
+- Capacidade do Random Forest de computar a importância das features, o que se mostrou valioso.
+- Robustez do modelo a outliers e ruído, que são características presentes no dataset.
+
+A fase de model planning seguiu o ciclo de ciência de dados, abrangendo a limpeza, o pré-processamento e a criação de novas features relevantes. Testes de hipóteses foram realizados para avaliar a significância de cada classe.
