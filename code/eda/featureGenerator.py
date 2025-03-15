@@ -1,3 +1,5 @@
+import numpy as np
+
 class FeatureGenerator:
     def __init__(self, data_analizer):
         self.data_analizer = data_analizer
@@ -21,7 +23,7 @@ class FeatureGenerator:
 
     def add_domain_knowledge_features(self):
         self.calculate_trip_duration()
-        self.calculate_trip_duration()
+        self.calculate_average_speed()
 
 
     def add_statistical_features(self):
@@ -33,7 +35,54 @@ class FeatureGenerator:
         Returns:
             None
         """
-        pass
+        data_train = self.data_analizer.data_train
+        data_test = self.data_analizer.data_test
+
+        # Mean features
+        data_train['trip_distance_mean'] = data_train['trip_distance'].mean()
+        data_train['tip_amount_mean'] = data_train['tip_amount'].mean()
+        data_train['tolls_amount_mean'] = data_train['tolls_amount'].mean()
+        data_train['extra_mean'] = data_train['extra'].mean()
+        data_train['pickup_time_in_seconds_mean'] = data_train['pickup_time_in_seconds'].mean()
+        data_train['dropoff_time_in_seconds_mean'] = data_train['dropoff_time_in_seconds'].mean()
+
+        data_test['trip_distance_mean'] = data_test['trip_distance'].mean()
+        data_test['tip_amount_mean'] = data_test['tip_amount'].mean()
+        data_test['tolls_amount_mean'] = data_test['tolls_amount'].mean()
+        data_test['extra_mean'] = data_test['extra'].mean()
+        data_test['pickup_time_in_seconds_mean'] = data_test['pickup_time_in_seconds'].mean()
+        data_test['dropoff_time_in_seconds_mean'] = data_test['dropoff_time_in_seconds'].mean()
+
+        # Standard deviation features
+        data_train['trip_distance_std'] = data_train['trip_distance'].std()
+        data_train['tip_amount_std'] = data_train['tip_amount'].std()
+        data_train['tolls_amount_std'] = data_train['tolls_amount'].std()
+        data_train['pickup_time_in_seconds_std'] = data_train['pickup_time_in_seconds'].std()
+        data_train['dropoff_time_in_seconds_std'] = data_train['dropoff_time_in_seconds'].std()
+
+        data_test['trip_distance_std'] = data_test['trip_distance'].std()
+        data_test['tip_amount_std'] = data_test['tip_amount'].std()
+        data_test['tolls_amount_std'] = data_test['tolls_amount'].std()
+        data_test['pickup_time_in_seconds_std'] = data_test['pickup_time_in_seconds'].std()
+        data_test['dropoff_time_in_seconds_std'] = data_test['dropoff_time_in_seconds'].std()
+
+        # Ratio features
+        data_train['trip_time_ratio'] = (data_train['dropoff_time_in_seconds'] - data_train['pickup_time_in_seconds']) / data_train['trip_distance']
+        data_train['tip_per_distance'] = data_train['tip_amount'] / data_train['trip_distance']
+
+        data_test['trip_time_ratio'] = (data_test['dropoff_time_in_seconds'] - data_test['pickup_time_in_seconds']) / data_test['trip_distance']
+        data_test['tip_per_distance'] = data_test['tip_amount'] / data_test['trip_distance']
+
+        # Percentile-based features (e.g., 90th percentile)
+        data_train['trip_distance_90th_percentile'] = data_train['trip_distance'].quantile(0.9)
+        data_train['tip_amount_90th_percentile'] = data_train['tip_amount'].quantile(0.9)
+
+        data_test['trip_distance_90th_percentile'] = data_test['trip_distance'].quantile(0.9)
+        data_test['tip_amount_90th_percentile'] = data_test['tip_amount'].quantile(0.9)
+
+        # Add the modified dataframe back to data_analizer or return it if needed
+        self.data_analizer.data_train = data_train
+        self.data_analizer.data_test = data_test
 
 
     def add_interaction_features(self):
@@ -46,7 +95,19 @@ class FeatureGenerator:
         Returns:
             None
         """
-        pass
+        self.data_analizer.data_train['trip_distance_passenger'] = self.data_analizer.data_train['trip_distance'] * self.data_analizer.data_train['passenger_count']
+        self.data_analizer.data_train['tip_per_mile'] = self.data_analizer.data_train['tip_amount'] / (self.data_analizer.data_train['trip_distance'] + 1e-8)
+        self.data_analizer.data_train['tolls_per_mile'] = self.data_analizer.data_train['tolls_amount'] / (self.data_analizer.data_train['trip_distance'] + 1e-8)
+        self.data_analizer.data_train['pickup_dropoff_duration'] = self.data_analizer.data_train['dropoff_time_in_seconds'] - self.data_analizer.data_train['pickup_time_in_seconds']
+        self.data_analizer.data_train['pickup_dropoff_hour_diff'] = self.data_analizer.data_train['dropoff_hour'] - self.data_analizer.data_train['pickup_hour']
+
+        self.data_analizer.data_test['trip_distance_passenger'] = self.data_analizer.data_test['trip_distance'] * self.data_analizer.data_test['passenger_count']
+        self.data_analizer.data_test['tip_per_mile'] = self.data_analizer.data_test['tip_amount'] / (self.data_analizer.data_test['trip_distance'] + 1e-8)
+        self.data_analizer.data_test['tolls_per_mile'] = self.data_analizer.data_test['tolls_amount'] / (self.data_analizer.data_test['trip_distance'] + 1e-8)
+        self.data_analizer.data_test['pickup_dropoff_duration'] = self.data_analizer.data_test['dropoff_time_in_seconds'] - self.data_analizer.data_test['pickup_time_in_seconds']
+        self.data_analizer.data_test['pickup_dropoff_hour_diff'] = self.data_analizer.data_test['dropoff_hour'] - self.data_analizer.data_test['pickup_hour']
+
+        print("Interaction features added successfully.")
 
 
     def add_nonlinear_interaction_features(self):
@@ -59,8 +120,30 @@ class FeatureGenerator:
         Returns:
             None
         """
-        pass
+        self.data_analizer.data_train['trip_distance_squared'] = self.data_analizer.data_train['trip_distance'] ** 2
+        self.data_analizer.data_train['log_trip_distance'] = np.log(self.data_analizer.data_train['trip_distance'].replace(0,1e-8))  # Log transform to handle skew
+        self.data_analizer.data_train['exp_tip_per_mile'] = np.exp(self.data_analizer.data_train['tip_per_mile'].clip(-10,10))
 
+        self.data_analizer.data_test['trip_distance_squared'] = self.data_analizer.data_test['trip_distance'] ** 2
+        self.data_analizer.data_test['log_trip_distance'] = np.log(self.data_analizer.data_test['trip_distance'] + 1e-8)  # Log transform to handle skew
+        self.data_analizer.data_test['exp_tip_per_mile'] = np.exp(self.data_analizer.data_test['tip_per_mile'])
+
+        # Encoding cyclical time features
+        self.data_analizer.data_train['pickup_hour_sin'] = np.sin(2 * np.pi * self.data_analizer.data_train['pickup_hour'] / 24)
+        self.data_analizer.data_train['pickup_hour_cos'] = np.cos(2 * np.pi * self.data_analizer.data_train['pickup_hour'] / 24)
+        self.data_analizer.data_train['pickup_day_sin'] = np.sin(2 * np.pi * self.data_analizer.data_train['pickup_day_of_week'] / 7)
+        self.data_analizer.data_train['pickup_day_cos'] = np.cos(2 * np.pi * self.data_analizer.data_train['pickup_day_of_week'] / 7)
+
+        self.data_analizer.data_test['pickup_hour_sin'] = np.sin(2 * np.pi * self.data_analizer.data_test['pickup_hour'] / 24)
+        self.data_analizer.data_test['pickup_hour_cos'] = np.cos(2 * np.pi * self.data_analizer.data_test['pickup_hour'] / 24)
+        self.data_analizer.data_test['pickup_day_sin'] = np.sin(2 * np.pi * self.data_analizer.data_test['pickup_day_of_week'] / 7)
+        self.data_analizer.data_test['pickup_day_cos'] = np.cos(2 * np.pi * self.data_analizer.data_test['pickup_day_of_week'] / 7)
+
+        self.data_analizer.data_train.replace([np.inf, -np.inf], np.nan, inplace=True)
+        self.data_analizer.data_train.fillna(0, inplace=True)
+
+        self.data_analizer.data_test.replace([np.inf, -np.inf], np.nan, inplace=True)
+        self.data_analizer.data_test.fillna(0, inplace=True)
 
     # Metodo para calcular o tempo de duração da viagem
     def calculate_trip_duration(self):

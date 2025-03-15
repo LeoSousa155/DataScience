@@ -188,5 +188,4 @@ class TripDataAnalizer(DataAnalizer):
         if col_name in self.df.columns:
             self.df.drop(col_name, inplace=True)
             print(f"Feature '{col_name}' dropped successfully.")
-        else:
-            print(f"Feature '{col_name}' was not found in the dataset.")
+        else:            print(f"Feature '{col_name}' was not found in the dataset.")

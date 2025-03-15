@@ -36,9 +36,10 @@ class EDA:
         """
             Visualizes the distribution of numerical features using histograms.
         """
-        plt.figure(figsize=(12, 6))
-        self.analizer.data_train.hist(figsize=(12, 8), bins=30)
+        plt.figure(figsize=(12, 12))
+        self.analizer.data_train.hist(figsize=(12, 12), bins=30)
         plt.suptitle("Feature Distributions", fontsize=16)
+        plt.tight_layout()
         plt.show()
 
     def boxplot_outliers(self):
@@ -53,8 +54,10 @@ class EDA:
         """
             Generates a heatmap showing correlations between numerical features.
         """
-        plt.figure(figsize=(10, 6))
-        sns.heatmap(self.analizer.data_train.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+        plt.figure(figsize=(12, 10))
+        sns.heatmap(self.analizer.data_train.corr(), annot=True, cmap="coolwarm", linewidths=1, fmt='.2f', annot_kws={"size": 8})
+        plt.xticks(rotation=45, ha="right")
+        plt.yticks(rotation=0)
         plt.title("Feature Correlation Matrix")
         plt.show()
 
