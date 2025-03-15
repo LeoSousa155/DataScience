@@ -90,3 +90,8 @@ Após a análise e tratamento dos dados, concluiu-se que o modelo mais apropriad
 - Robustez do modelo a outliers e ruído, que são características presentes no dataset.
 
 A fase de model planning seguiu o ciclo de ciência de dados, abrangendo a limpeza, o pré-processamento e a criação de novas features relevantes. Testes de hipóteses foram realizados para avaliar a significância de cada classe.
+
+## Resultado
+Como resultado da nossa análise dos dados conseguimos criar um conjunto de dados que irão ser utilizados nas próximas fases para treinar os nossos modelos
+
+Link: https://drive.google.com/file/d/1VdCwn-FpwIJ4Ox7nWTWjZCORiRnxpy9Q/view?usp=drive_link
