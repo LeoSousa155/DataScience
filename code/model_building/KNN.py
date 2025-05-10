@@ -1,8 +1,9 @@
+import BaseModel
+
 import numpy as np
 from collections import Counter
 
-
-class KNN:
+class KNN(BaseModel):
     def __init__(self, k=3, problem_type='auto'):
         """
         Initialize the KNN model.
