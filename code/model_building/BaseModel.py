@@ -1,12 +1,14 @@
 import pickle
+from abc import abstractmethod
 from pathlib import Path
 from typing import Union
-import numpy as np
-from collections import Counter
-
 
 class BaseModel:
     """Base class for all models with serialization capabilities."""
+
+    @abstractmethod
+    def predict(self, X):
+        pass
 
     def serialize(self, file_path: Union[str, Path]) -> None:
         """
