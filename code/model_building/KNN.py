@@ -2,6 +2,7 @@ import numpy as np
 from typing import Any, List, Optional, Union
 from numba import njit
 from numba.typed import List as NumbaList
+from .BaseModel import BaseModel
 
 class KDTreeNode:
     """
@@ -43,6 +44,7 @@ def build_kdtree(data: np.ndarray, labels: np.ndarray, depth: int = 0) -> Option
         build_kdtree(data[idx[n//2+1:]], labels[idx[n//2+1:]], depth + 1)
     )
 
+
 @njit
 def knn_query_numba(points_arr, labels_arr, split_dims, k, query_point):
     """
@@ -78,7 +80,8 @@ def knn_query_numba(points_arr, labels_arr, split_dims, k, query_point):
             stack.append(near)
     return labels_out
 
-class KNN:
+
+class KNN(BaseModel):
     """
     K-Nearest Neighbors using custom KD-Tree with optional Numba acceleration.
 
@@ -177,12 +180,3 @@ class KNN:
         if self.verbose:
             print("Prediction complete")
         return preds
-
-if __name__ == '__main__':
-    # Quick test
-    np.random.seed(0)
-    X = np.random.rand(100, 3)
-    y = np.random.randint(0, 3, 100)
-    model = KNN(k=5, task='classification', verbose=True)
-    model.fit(X, y)
-    print(model.predict(X[:5]))

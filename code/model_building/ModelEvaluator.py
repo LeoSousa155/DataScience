@@ -292,15 +292,15 @@ class ModelEvaluator:
                 average = 'binary' if self.task_type == 'binary' else 'macro'
                 if metric == 'precision':
                     metrics_dict[metric] = metrics.precision_score(
-                        y_true, y_pred, average=average, pos_label=self.pos_label
+                        y_true, y_pred, average=average, pos_label=self.pos_label, zero_division=0
                     )
                 elif metric == 'recall':
                     metrics_dict[metric] = metrics.recall_score(
-                        y_true, y_pred, average=average, pos_label=self.pos_label
+                        y_true, y_pred, average=average, pos_label=self.pos_label, zero_division=0
                     )
                 elif metric == 'f1':
                     metrics_dict[metric] = metrics.f1_score(
-                        y_true, y_pred, average=average, pos_label=self.pos_label
+                        y_true, y_pred, average=average, pos_label=self.pos_label, zero_division=0
                     )
             elif metric == 'auc':
                 if self.task_type == 'binary':
@@ -312,7 +312,7 @@ class ModelEvaluator:
                 metrics_dict[metric] = metrics.average_precision_score(
                     y_true, y_prob[:, 1]
                 )
-            elif metric == 'log_loss':
+            elif metric == 'log_loss' and y_prob is not None:
                 metrics_dict[metric] = metrics.log_loss(y_true, y_prob)
             elif metric == 'brier_score':
                 metrics_dict[metric] = metrics.brier_score_loss(y_true, y_prob[:, 1])
@@ -320,11 +320,11 @@ class ModelEvaluator:
                              'recall_micro', 'f1_macro', 'f1_micro']:
                 average = metric.split('_')[-1]  # Extract 'macro' or 'micro'
                 if 'precision' in metric:
-                    metrics_dict[metric] = metrics.precision_score(y_true, y_pred, average=average)
+                    metrics_dict[metric] = metrics.precision_score(y_true, y_pred, average=average, zero_division=0)
                 elif 'recall' in metric:
-                    metrics_dict[metric] = metrics.recall_score(y_true, y_pred, average=average)
+                    metrics_dict[metric] = metrics.recall_score(y_true, y_pred, average=average, zero_division=0)
                 elif 'f1' in metric:
-                    metrics_dict[metric] = metrics.f1_score(y_true, y_pred, average=average)
+                    metrics_dict[metric] = metrics.f1_score(y_true, y_pred, average=average, zero_division=0)
             elif metric == 'r2':
                 metrics_dict[metric] = metrics.r2_score(y_true, y_pred)
             elif metric == 'mse':

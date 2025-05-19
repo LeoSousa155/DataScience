@@ -1,6 +1,6 @@
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, classification_report, confusion_matrix
-import BaseModel
+from .BaseModel import BaseModel
 
 
 class DecisionTree(BaseModel):
@@ -54,6 +54,13 @@ class DecisionTree(BaseModel):
             array-like: Model predictions.
         """
         return self.model.predict(X)
+
+
+    def predict_proba(self, X):
+        if self.problem_type != 'classification':
+            raise NotImplementedError("predict_proba is only available for classification tasks.")
+        return self.model.predict_proba(X)
+
 
     def evaluate(self, X_test, y_test):
         """
