@@ -17,6 +17,7 @@ class BaseModel:
         Args:
             file_path: Path where the model will be saved.
         """
+        print(f"Saving model in {file_path}")
         with open(file_path, 'wb') as f:
             pickle.dump(self, f)
 
