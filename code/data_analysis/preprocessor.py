@@ -6,7 +6,7 @@ class DataPreprocessor:
     Class responsible for preprocessing the loaded dataset. Need to pass the data with first columns as numerical and the last columns as categorical, then indicate how many categorical features are present in the dataset
 
     Methods:
-        _normalize_features(): Normalizes all features using standard scaling for numerical and min-max scalling for categorical.
+        _normalize_features(): Normalizes all features using standard scaling for numerical and min-max scaling for categorical.
     """
 
     def __init__(self, data_loader, number_categorical_features):

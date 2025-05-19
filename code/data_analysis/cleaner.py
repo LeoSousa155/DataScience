@@ -8,6 +8,7 @@ class DataCleaning:
         handle_missing_values(strategy='drop'): Handle missing values using the specified strategy.
         detect_outliers(threshhold=4): Detect outliers in numerical features using z-score method.
         remove_outliers(threshold=3): Remove outliers from the dataset
+        remove_NaN: Remove NaN values from the dataset.
     """
     def __init__(self, data_analizer):
         """
@@ -124,3 +125,13 @@ class DataCleaning:
 
         except ValueError as ve:
             print("Error:", ve)
+
+
+    def remove_nan(self):
+        """
+        Remove NaN values from the dataset.
+        """
+        self.data_analizer.data_train   = self.data_analizer.data_train.dropna()
+        self.data_analizer.data_test    = self.data_analizer.data_test.dropna()
+        self.data_analizer.labels_train = self.data_analizer.labels_train.dropna()
+        self.data_analizer.labels_test  = self.data_analizer.labels_test.dropna()
