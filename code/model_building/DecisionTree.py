@@ -35,7 +35,7 @@ class DecisionTree(BaseModel):
 
     def fit(self, X, y):
         """
-        Trains the Decision Tree model with the provided training data.
+        Trains the Decision Tree model with he provided training data.
 
         Args:
             X (array-like): Training data (features).
