@@ -5,7 +5,6 @@ from sklearn.metrics import accuracy_score, mean_squared_error, classification_r
 from sklearn.utils import compute_class_weight
 from torch.utils.data import DataLoader, TensorDataset
 
-
 class NeuralNetworkTrainer:
     def __init__(self, model, task, lr=0.001, class_weights=None):
         self.model = model

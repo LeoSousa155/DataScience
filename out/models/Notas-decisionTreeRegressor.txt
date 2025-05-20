@@ -1,0 +1,222 @@
+========================================
+--- Regressão com Decision Tree ---
+
+Tempo total de treino: 7s
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+========================================
+--- Regressão com Decision Tree ---
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+Resultados CV:
+rmse_mean: 6.6924
+rmse_std: 2.9694
+mse_mean: 53.6063
+mse_std: 45.1255
+mae_mean: 1.7177
+mae_std: 0.0541
+r2_mean: 0.6473
+r2_std: 0.3326
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=None (rmse_mean=6.6924)
+
+Training Decision Tree Regression for max_depth = 2
+max_depth=2
+========================================
+--- Regressão com Decision Tree ---
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+Resultados CV:
+rmse_mean: 6.6924
+rmse_std: 2.9694
+mse_mean: 53.6063
+mse_std: 45.1255
+mae_mean: 1.7177
+mae_std: 0.0541
+r2_mean: 0.6473
+r2_std: 0.3326
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=None (rmse_mean=6.6924)
+
+Training Decision Tree Regression for max_depth = 2
+max_depth=2
+Resultados CV:
+rmse_mean: 7.2659
+rmse_std: 1.8306
+mse_mean: 56.1447
+mse_std: 31.1720
+mae_mean: 3.4739
+mae_std: 0.4103
+r2_mean: 0.6621
+r2_std: 0.1038
+
+Training Decision Tree Regression for max_depth = 5
+max_depth=5
+========================================
+--- Regressão com Decision Tree ---
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+Resultados CV:
+rmse_mean: 6.6924
+rmse_std: 2.9694
+mse_mean: 53.6063
+mse_std: 45.1255
+mae_mean: 1.7177
+mae_std: 0.0541
+r2_mean: 0.6473
+r2_std: 0.3326
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=None (rmse_mean=6.6924)
+
+Training Decision Tree Regression for max_depth = 2
+max_depth=2
+Resultados CV:
+rmse_mean: 7.2659
+rmse_std: 1.8306
+mse_mean: 56.1447
+mse_std: 31.1720
+mae_mean: 3.4739
+mae_std: 0.4103
+r2_mean: 0.6621
+r2_std: 0.1038
+
+Training Decision Tree Regression for max_depth = 5
+max_depth=5
+Resultados CV:
+rmse_mean: 7.8399
+rmse_std: 2.6547
+mse_mean: 68.5120
+mse_std: 42.0330
+mae_mean: 2.0395
+mae_std: 0.0350
+r2_mean: 0.5481
+r2_std: 0.3156
+
+Training Decision Tree Regression for max_depth = 10
+max_depth=10
+========================================
+--- Regressão com Decision Tree ---
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+Resultados CV:
+rmse_mean: 6.6924
+rmse_std: 2.9694
+mse_mean: 53.6063
+mse_std: 45.1255
+mae_mean: 1.7177
+mae_std: 0.0541
+r2_mean: 0.6473
+r2_std: 0.3326
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=None (rmse_mean=6.6924)
+
+Training Decision Tree Regression for max_depth = 2
+max_depth=2
+Resultados CV:
+rmse_mean: 7.2659
+rmse_std: 1.8306
+mse_mean: 56.1447
+mse_std: 31.1720
+mae_mean: 3.4739
+mae_std: 0.4103
+r2_mean: 0.6621
+r2_std: 0.1038
+
+Training Decision Tree Regression for max_depth = 5
+max_depth=5
+Resultados CV:
+rmse_mean: 7.8399
+rmse_std: 2.6547
+mse_mean: 68.5120
+mse_std: 42.0330
+mae_mean: 2.0395
+mae_std: 0.0350
+r2_mean: 0.5481
+r2_std: 0.3156
+
+Training Decision Tree Regression for max_depth = 10
+max_depth=10
+Resultados CV:
+rmse_mean: 6.3765
+rmse_std: 3.2143
+mse_mean: 50.9916
+mse_std: 46.8889
+mae_mean: 1.5847
+mae_std: 0.0532
+r2_mean: 0.6668
+r2_std: 0.3406
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=10 (rmse_mean=6.3765)
+
+Training Decision Tree Regression for max_depth = 20
+max_depth=20
+========================================
+--- Regressão com Decision Tree ---
+
+Training Decision Tree Regression for max_depth = None
+max_depth=None
+Resultados CV:
+rmse_mean: 6.6924
+rmse_std: 2.9694
+mse_mean: 53.6063
+mse_std: 45.1255
+mae_mean: 1.7177
+mae_std: 0.0541
+r2_mean: 0.6473
+r2_std: 0.3326
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=None (rmse_mean=6.6924)
+
+Training Decision Tree Regression for max_depth = 2
+max_depth=2
+Resultados CV:
+rmse_mean: 7.2659
+rmse_std: 1.8306
+mse_mean: 56.1447
+mse_std: 31.1720
+mae_mean: 3.4739
+mae_std: 0.4103
+r2_mean: 0.6621
+r2_std: 0.1038
+
+Training Decision Tree Regression for max_depth = 5
+max_depth=5
+Resultados CV:
+rmse_mean: 7.8399
+rmse_std: 2.6547
+mse_mean: 68.5120
+mse_std: 42.0330
+mae_mean: 2.0395
+mae_std: 0.0350
+r2_mean: 0.5481
+r2_std: 0.3156
+
+Training Decision Tree Regression for max_depth = 10
+max_depth=10
+Resultados CV:
+rmse_mean: 6.3765
+rmse_std: 3.2143
+mse_mean: 50.9916
+mse_std: 46.8889
+mae_mean: 1.5847
+mae_std: 0.0532
+r2_mean: 0.6668
+r2_std: 0.3406
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=10 (rmse_mean=6.3765)
+
+Training Decision Tree Regression for max_depth = 20
+max_depth=20
+Resultados CV:
+rmse_mean: 6.0131
+rmse_std: 2.2659
+mse_mean: 41.2922
+mse_std: 29.1414
+mae_mean: 1.6270
+mae_std: 0.0583
+r2_mean: 0.7485
+r2_std: 0.1627
+-> Novo melhor modelo REGRESSÃO encontrado com max_depth=20 (rmse_mean=6.0131)
+------------------------------
+Saving best regression model...
+Saving model in ../out/models/decisionTreeRegressor.pkl
+Best regression model (max_depth=20, rmse_mean=6.0131) saved to ../out/models/decisionTreeRegressor.pkl
+------------------------------

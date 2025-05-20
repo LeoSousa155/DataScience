@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
-from typing import Union, Any
+from typing import Union, Any, Dict
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+
 
 class GDBSCANMixed:
     """
@@ -46,6 +50,7 @@ class GDBSCANMixed:
         self.distance_metric = distance_metric
         self.labels = None
         self._train_data = None # Store training data for prediction
+        self.feature_names = None # To store feature names for better plots
 
     def _gower_distance(self, data: pd.DataFrame) -> np.ndarray:
         """
@@ -98,6 +103,11 @@ class GDBSCANMixed:
             None: The cluster labels are stored in the `self.labels` attribute.
         """
         self._train_data = X.copy() # Store training data for prediction
+        if isinstance(X, pd.DataFrame):
+            self.feature_names = X.columns.tolist()
+        else:
+            self.feature_names = [f"feature_{i}" for i in range(X.shape[1])]
+
         n_samples = X.shape[0]
         self.labels = np.full(n_samples, -1, dtype=int) # Initialize all points as noise (-1)
         cluster_id = 0
@@ -124,7 +134,7 @@ class GDBSCANMixed:
                 cluster_id += 1
 
     def _expand_cluster(self, X: pd.DataFrame, start_point: int, neighbors_indices: np.ndarray,
-                        cluster_id: int, distance_matrix: np.ndarray) -> None:
+                         cluster_id: int, distance_matrix: np.ndarray) -> None:
         """
         Recursively expands a cluster starting from a core point.
 
@@ -154,7 +164,8 @@ class GDBSCANMixed:
                 # add its neighbors to the queue to expand the cluster further
                 if len(new_neighbors_indices) >= self.min_samples:
                     for neighbor_index in new_neighbors_indices:
-                        if neighbor_index not in queue and self.labels[neighbor_index] == -1:
+                        # Only add if not already processed and not yet assigned to a cluster
+                        if self.labels[neighbor_index] == -1: # Check for -1 (noise or unvisited)
                             queue.append(neighbor_index)
             i += 1
 
@@ -181,23 +192,43 @@ class GDBSCANMixed:
 
         new_labels = np.full(X.shape[0], -1, dtype=int) # Default to noise
 
+        # Concatenate train and test data to calculate distances consistently
+        combined_data = pd.concat([self._train_data, X], ignore_index=True)
+
         if self.distance_metric == 'gower':
-            train_distance_matrix = self._gower_distance(self._train_data)
-            predict_distance_matrix = self._gower_distance(pd.concat([self._train_data, X], ignore_index=True)).iloc[len(self._train_data):]
+            full_distance_matrix = self._gower_distance(combined_data)
         else:
-            raise NotImplementedError("Prediction for custom distance metric not implemented.")
+            raise NotImplementedError("Prediction for custom distance metric not implemented for callable distance_metric.")
+
+        # Extract the relevant part of the distance matrix: distances from new points to training points
+        # Rows correspond to new points, columns to training points
+        distances_new_to_train = full_distance_matrix[len(self._train_data):, :len(self._train_data)]
+        
+        # Determine core points from the training data
+        train_core_points = np.zeros(len(self._train_data), dtype=bool)
+        for i in range(len(self._train_data)):
+            neighbors_count = np.sum(full_distance_matrix[i, :len(self._train_data)] <= self.eps)
+            if neighbors_count >= self.min_samples:
+                train_core_points[i] = True
 
         for i in range(X.shape[0]):
-            distances_to_train = predict_distance_matrix[i]
-            nearest_neighbor_index = np.argmin(distances_to_train)
-            if distances_to_train[nearest_neighbor_index] <= self.eps and np.sum(train_distance_matrix[nearest_neighbor_index] <= self.eps) >= self.min_samples:
-                # Assign the new point to the cluster of its nearest core point neighbor
-                new_labels[i] = self.labels[nearest_neighbor_index]
+            distances_to_train = distances_new_to_train[i]
+            # Find all training points within eps distance
+            potential_neighbors_indices = np.where(distances_to_train <= self.eps)[0]
+
+            assigned_cluster = -1
+            # Prioritize core points within eps
+            for nn_idx in potential_neighbors_indices:
+                if train_core_points[nn_idx] and self.labels[nn_idx] != -1: # Ensure it's a core point and part of a cluster
+                    assigned_cluster = self.labels[nn_idx]
+                    break # Assign to the first found core point's cluster
+
+            new_labels[i] = assigned_cluster
 
         return new_labels
 
     def evaluate(self, X_test: Union[pd.DataFrame, None] = None,
-                 y_test: Union[np.ndarray, pd.Series, None] = None) -> dict:
+                     y_test: Union[np.ndarray, pd.Series, None] = None) -> Dict[str, Any]:
         """
         Evaluates the clustering performance using external evaluation metrics
         if ground truth labels are provided.
@@ -211,14 +242,30 @@ class GDBSCANMixed:
 
         Returns:
             dict: A dictionary containing evaluation metrics. Currently includes
-                Adjusted Rand Score and Normalized Mutual Information if y_test
-                is provided and the number of labels matches.
+            Adjusted Rand Score and Normalized Mutual Information if y_test
+            is provided and the number of labels matches.
         """
         results = {}
         if y_test is not None and self.labels is not None and len(self.labels) == len(y_test):
-            from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
-            results['adjusted_rand_score'] = adjusted_rand_score(y_test, self.labels)
-            results['normalized_mutual_info_score'] = normalized_mutual_info_score(y_test, self.labels)
+            # Ensure y_test is a numpy array for consistent indexing
+            if isinstance(y_test, pd.Series):
+                y_test = y_test.values
+
+            # Filter out noise points (-1) from both predicted and true labels for evaluation
+            # as these metrics typically don't handle noise labels directly
+            non_noise_indices = np.where(self.labels != -1)[0]
+            if len(non_noise_indices) > 0:
+                filtered_labels = self.labels[non_noise_indices]
+                filtered_y_test = y_test[non_noise_indices]
+
+                # Ensure there's more than one unique label for metrics to be meaningful
+                if len(np.unique(filtered_labels)) > 1 and len(np.unique(filtered_y_test)) > 1:
+                    results['adjusted_rand_score'] = adjusted_rand_score(filtered_y_test, filtered_labels)
+                    results['normalized_mutual_info_score'] = normalized_mutual_info_score(filtered_y_test, filtered_labels)
+                else:
+                    print("Warning: Not enough unique labels after filtering noise for ARI/NMI calculation.")
+            else:
+                print("Warning: All points labeled as noise, cannot calculate ARI/NMI.")
         return results
 
     def get_centroids(self) -> None:
@@ -230,3 +277,100 @@ class GDBSCANMixed:
         Returns None.
         """
         return None
+
+    def plot_clusters(self, X: pd.DataFrame, title: str = "GDBSCAN Clustering") -> None:
+        """
+        Visualizes the clusters formed by GDBSCAN.
+
+        Args:
+            X (pd.DataFrame): The data used for clustering (features).
+            title (str): Title of the plot.
+        """
+        if self.labels is None:
+            raise RuntimeError("Model has not been fitted yet. Call fit() before plotting.")
+
+        X_df = X.copy()
+        X_df['cluster'] = self.labels
+
+        # Identify numerical and categorical features
+        numerical_features = [col for col in X_df.columns if pd.api.types.is_numeric_dtype(X_df[col]) and col != 'cluster']
+        categorical_features = [col for col in X_df.columns if not pd.api.types.is_numeric_dtype(X_df[col]) and col != 'cluster']
+
+        # --- Numerical Features Visualization (Scatter Plots) ---
+        if len(numerical_features) >= 2:
+            print(f"\n--- Visualizing Numerical Features for {title} ---")
+            # Create scatter plots for pairs of numerical features
+            # Using hue for 'cluster' and style for distinguishing noise
+            
+            # Map cluster labels to string for better legend and hue handling
+            X_df['cluster_str'] = X_df['cluster'].astype(str)
+            # Replace -1 with 'Noise' for plotting
+            X_df['cluster_str'] = X_df['cluster_str'].replace('-1', 'Noise')
+
+            # Determine unique clusters for palette
+            unique_clusters = sorted(X_df['cluster_str'].unique())
+            # Ensure 'Noise' is always last and potentially a distinct color (e.g., grey/black)
+            if 'Noise' in unique_clusters:
+                unique_clusters.remove('Noise')
+                unique_clusters.append('Noise')
+            
+            # Generate a color palette, ensuring 'Noise' has a specific color if present
+            palette = sns.color_palette("viridis", n_colors=len(unique_clusters) - (1 if 'Noise' in unique_clusters else 0))
+            if 'Noise' in unique_clusters:
+                palette.append('gray') # Assign gray to noise
+            cluster_palette = dict(zip(unique_clusters, palette))
+
+
+            # Plotting only the first two numerical features for simplicity in pairplot
+            if len(numerical_features) >= 2:
+                plt.figure(figsize=(10, 8))
+                sns.scatterplot(
+                    x=numerical_features[0],
+                    y=numerical_features[1],
+                    hue='cluster_str',
+                    style='cluster_str', # Use style to differentiate noise points
+                    data=X_df,
+                    palette=cluster_palette,
+                    s=80, # Marker size
+                    alpha=0.7 # Transparency
+                )
+                plt.title(f'Cluster Visualization of {numerical_features[0]} vs {numerical_features[1]}\n{title}')
+                plt.xlabel(numerical_features[0])
+                plt.ylabel(numerical_features[1])
+                plt.legend(title='Cluster')
+                plt.grid(True, linestyle='--', alpha=0.6)
+                plt.show()
+            else:
+                print("Not enough numerical features (at least 2 required) for scatter plot visualization.")
+
+        # --- Categorical Features Visualization (Count Plots) ---
+        if categorical_features:
+            print(f"\n--- Visualizing Categorical Features for {title} ---")
+            num_categorical_plots = len(categorical_features)
+            cols = 2 # Max 2 columns per row for categorical plots
+            rows = (num_categorical_plots + cols - 1) // cols
+            fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5 * rows))
+            axes = axes.flatten()
+
+            for i, feature in enumerate(categorical_features):
+                sns.countplot(x=feature, hue='cluster_str', data=X_df, ax=axes[i], palette=cluster_palette)
+                axes[i].set_title(f'{feature} Distribution by Cluster')
+                axes[i].set_xlabel(feature)
+                axes[i].set_ylabel('Count')
+                axes[i].tick_params(axis='x', rotation=45) # Rotate labels if needed
+                axes[i].legend(title='Cluster')
+
+            # Hide unused subplots
+            for j in range(i + 1, len(axes)):
+                fig.delaxes(axes[j])
+
+            plt.tight_layout()
+            plt.suptitle(f"Distribution of Categorical Features Across Clusters\n{title}", y=1.02, fontsize=16)
+            plt.show()
+        else:
+            print("No categorical features to visualize.")
+
+        print("\n--- Cluster Sizes ---")
+        # Ensure 'Noise' is explicitly mentioned for -1
+        cluster_counts = X_df['cluster_str'].value_counts().sort_index()
+        print(cluster_counts)

@@ -1,0 +1,61 @@
+--- Regressão com KNN Customizado ---
+
+tempo total de treino: 34m 16s
+
+
+Treinando KNN Customizado para k = 1
+k = 1
+Resultados CV:
+rmse_mean: 6.8847
+mae_mean: 3.7447
+r2_mean: 0.6969
+rmse_std: 1.7235
+mae_std: 0.0345
+r2_std: 0.0920
+-> Novo melhor modelo encontrado com k=1 (rmse_mean=6.8847)
+
+Treinando KNN Customizado para k = 3
+k = 3
+Resultados CV:
+rmse_mean: 6.0537
+mae_mean: 3.1834
+r2_mean: 0.7638
+rmse_std: 1.8852
+mae_std: 0.0454
+r2_std: 0.1021
+-> Novo melhor modelo encontrado com k=3 (rmse_mean=6.0537)
+
+Treinando KNN Customizado para k = 5
+k = 5
+Resultados CV:
+rmse_mean: 5.9758
+mae_mean: 3.1058
+r2_mean: 0.7699
+rmse_std: 1.8585
+mae_std: 0.0429
+r2_std: 0.0993
+-> Novo melhor modelo encontrado com k=5 (rmse_mean=5.9758)
+
+Treinando KNN Customizado para k = 10
+k = 10
+Resultados CV:
+rmse_mean: 6.0769
+mae_mean: 3.1341
+r2_mean: 0.7620
+rmse_std: 1.9033
+mae_std: 0.0528
+r2_std: 0.1037
+
+Treinando KNN Customizado para k = 15
+k = 15
+Resultados CV:
+rmse_mean: 6.1622
+mae_mean: 3.1995
+r2_mean: 0.7556
+rmse_std: 1.8810
+mae_std: 0.0576
+r2_std: 0.1022
+------------------------------
+Saving best model...
+Saving model in ../out/models/decisionTreeClassifier.pkl
+------------------------------
