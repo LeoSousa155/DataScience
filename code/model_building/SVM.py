@@ -8,6 +8,9 @@ import pandas as pd
 from typing import Dict
 
 
+# Esta classe deixou de ser usada no notebook por demorar demasiado tempo a treinar
+
+
 class SupportVectorMachine:
     """
     A wrapper class for scikit-learn's Support Vector Machine algorithms
