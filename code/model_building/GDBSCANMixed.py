@@ -3,10 +3,11 @@ import numpy as np
 from typing import Union, Any, Dict
 import matplotlib.pyplot as plt
 import seaborn as sns
+from .BaseModel import BaseModel
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 
 
-class GDBSCANMixed:
+class GDBSCANMixed(BaseModel):
     """
     A density-based clustering algorithm that can handle mixed numerical and
     categorical data by using a custom distance metric (defaulting to Gower distance).

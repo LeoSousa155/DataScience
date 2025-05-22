@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Any, Optional, Tuple
 from numba import njit, prange
 from numba.typed import List as NumbaList
-from collections import deque  # Ensure deque is imported
+from collections import deque
 
 from .BaseModel import BaseModel
 
@@ -69,7 +69,6 @@ def _knn_search_core(points_arr: np.ndarray, labels_arr: np.ndarray, split_dims_
     return best_labels
 
 
-# MODULE-LEVEL HELPER FUNCTION (MOVED FROM BEING NESTED)
 def _build_kdtree_recursive_nodes(
         current_indices: np.ndarray,
         depth: int,

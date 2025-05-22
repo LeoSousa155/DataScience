@@ -104,30 +104,40 @@ class LinearModels(BaseModel):
         else:
             return base_model
 
-    def _get_param_grid(self) -> Dict:
+    def _get_param_grid(self):
         if self.problem_type == 'classification' and self.model_name == 'logistic':
-            return {
-                'C': [0.01, 0.1, 1, 10, 100],
-                'penalty': ['l1', 'l2', 'elasticnet', None],
-                'solver': ['saga'],
-                'l1_ratio': [0.1, 0.5, 0.9, None]
-            }
+            return [
+                # Penalidade L1
+                {
+                    'C': [0.01, 0.1, 1, 10, 100],
+                    'penalty': ['l1'],
+                    'solver': ['saga'],
+                    # Removido l1_ratio: [1.0] para evitar o UserWarning, pois 'l1' implica l1_ratio=1.0
+                },
+                # Penalidade L2
+                {
+                    'C': [0.01, 0.1, 1, 10, 100],
+                    'penalty': ['l2'],
+                    'solver': ['saga', 'lbfgs', 'newton-cg', 'sag'], # 'saga' pode ser lento para grandes datasets aqui
+                                                                       # lbfgs e newton-cg são boas escolhas para l2
+                },
+                # Penalidade ElasticNet
+                {
+                    'C': [0.01, 0.1, 1, 10, 100],
+                    'penalty': ['elasticnet'],
+                    'solver': ['saga'],
+                    'l1_ratio': [0.1, 0.5, 0.9]
+                },
+                # Sem Penalidade
+                {
+                    'C': [0.01, 0.1, 1, 10, 100],
+                    'penalty': [None],
+                    'solver': ['lbfgs', 'newton-cg', 'sag', 'saga'] # 'saga' ainda é válido para None, mas outras opções são eficientes
+                }
+            ]
         elif self.problem_type == 'regression':
-            if self.model_name == 'linear':
-                return {}
-            elif self.model_name == 'ridge':
-                return {
-                    'alpha': [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-                }
-            elif self.model_name == 'lasso':
-                return {
-                    'alpha': [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0]
-                }
-            elif self.model_name == 'elasticnet':
-                return {
-                    'alpha': [0.01, 0.1, 1.0, 10.0],
-                    'l1_ratio': [0.1, 0.3, 0.5, 0.7, 0.9]
-                }
+            # ... (seu código atual para regressão) ...
+            pass
         return {}
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
