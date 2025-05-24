@@ -1,7 +1,7 @@
 import torch.nn as nn
 from .BaseModel import BaseModel
 
-class BaseNeuralNetwork(nn.Module, BaseModel):
+class BaseNeuralNetwork(nn.Module):
     def __init__(self, input_dim, output_dim, task_type='regression'):
         super().__init__()
         self.task_type = task_type
